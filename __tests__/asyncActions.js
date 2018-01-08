@@ -3,63 +3,56 @@ const asyncMockActions = require('../src/asyncMockActions');
 const filterActions = require('../src/filterActions');
 const fetchMock = require('fetch-mock');
 
-jest.mock('../src/asyncMockActions.js', () => ({
-  fetchData: () => Promise.resolve("HAHA FAKE")
+/* jest.mock mocks the whole module, that means that we 
+ * have to create fake functions to use instead of the actual
+ * ones. Here I am returning a promise with my own fake
+ * response like with fetchMock.
+ */
+jest.mock('../src/asyncMockActions', () => ({
+  fetchData: () => {
+    return Promise.resolve("My fake")
+  }
 }))
 
-test('test jest.mock', () => {
-  return asyncMockActions
-    .fetchData(asyncMockActions.url)
+/* When testing async with jest, always return something
+ * from the test */
+test('fake implementation with jest.mock', () => {
+  return asyncMockActions.fetchData()
+    .then(data => {
+      expect(data).toBe('My fake');
+    })
+})
+
+test('fetches data from actual server', () => {
+  return asyncActions.fetchData(asyncActions.url)
     .then(returnData => {
       expect(returnData).toBeDefined();
     })
 })
 
-test('should return response', () => {
-  return asyncActions
-    .fetchData(asyncActions.url)
-    .then((returnData) => {
-      expect(returnData).toBeDefined();
+test('fetches data with fetch-mock', () => {
+  const fakeResponse = [{ "id": 50, "body": "My own comment" }]
+  fetchMock.get(asyncActions.url, fakeResponse)
+  return asyncActions.fetchData(asyncActions.url)
+    .then(returnData => {
+      expect(returnData).toEqual(fakeResponse);
     })
-});
+})
 
-test.skip('should return response', () => {
-  return asyncActions
-    .fetchData(asyncActions.url)
-    .then((returnData) => {
-      expect(filterActions.filterById(returnData,1))
-        .toBeDefined();
+test('filter result from api', () => {
+  return asyncActions.fetchData(asyncActions.url)
+    .then(returnData => {
+      expect(filterActions.filterById(returnData, 1)).toHaveLength(1);
     })
-});
+})
 
-test('should return fake response', () => {
-  fetchMock.get(asyncActions.url, [
-    {
-      id: 1,
-      body: "Hej"
-    }
-  ])
-  fetchMock.get("http://hej.com/example", {})
-  return asyncActions
-    .fetchData(asyncActions.url)
-    .then((returnData) => {
-      expect(returnData).toBeDefined();
-    })
-});
-
-test('should return fake response', () => {
-  return asyncActions
-    .fetchAndStore(asyncActions.url)
-    .then((returnData) => {
+test('save data from api to localStorage', () => {
+  return asyncActions.fetchAndStore(asyncActions.url)
+    .then(() => {
       expect(localStorage.setItem).toHaveBeenCalledTimes(1);
     })
-});
+})
 
 afterEach(() => {
   fetchMock.restore();
-  fetchMock.reset();
-});
-
-afterAll(() => {
-
-});
+})
