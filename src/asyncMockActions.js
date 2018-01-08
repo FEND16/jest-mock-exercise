@@ -9,4 +9,4 @@ const asyncMockActions = {
   }
 }
 
-module.exports = asyncActions;
+module.exports = asyncMockActions;

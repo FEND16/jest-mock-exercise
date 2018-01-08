@@ -26,5 +26,5 @@ test.skip('tests if div is being populated', () => {
   return flushAllPromises()
     .then(() => {
       expect(output.textContent).not.toBe('');
-    })
+    });
 });
