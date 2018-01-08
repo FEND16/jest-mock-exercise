@@ -1,0 +1,25 @@
+{
+  "name": "jest-mock",
+  "description" : "Mocking fetch and localstorage with fetch",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Jesper Orb <jesperorb@gmail.com> (https://jesperorb.com/)",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watchAll",
+    "test:serve": "./node_modules/json-server/bin/index.js --watch db.json --port 3005 | jest --watchAll"
+  },
+  "dependencies": {
+    "fetch-mock": "6.0.0-beta.7",
+    "isomorphic-fetch": "2.2.1",
+    "jest": "22.0.4",
+    "json-server": "0.12.1"
+  },
+  "devDependencies": {
+    "jest-localstorage-mock": "2.1.0"
+  },
+  "jest": {
+    "setupFiles": ["jest-localstorage-mock"]
+  }
+}
